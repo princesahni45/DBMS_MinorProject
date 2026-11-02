@@ -1,0 +1,339 @@
+CREATE TABLE Airline (
+    airline_id INT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    country VARCHAR(100)
+);
+
+CREATE TABLE Aircraft (
+    aircraft_id INT PRIMARY KEY,
+    model VARCHAR(100),
+    capacity INT
+);
+
+CREATE TABLE Airport (
+    airport_id INT PRIMARY KEY,
+    name VARCHAR(100),
+    city VARCHAR(100)
+);
+
+CREATE TABLE Passenger (
+    passenger_id INT PRIMARY KEY,
+    name VARCHAR(100),
+    phone VARCHAR(20)
+);
+
+CREATE TABLE Flight (
+    flight_id INT PRIMARY KEY,
+    departure_time DATETIME,
+    arrival_time DATETIME,
+    airline_id INT,
+    aircraft_id INT,
+    departure_airport_id INT,
+    arrival_airport_id INT,
+
+    FOREIGN KEY (airline_id)
+        REFERENCES Airline(airline_id),
+
+    FOREIGN KEY (aircraft_id)
+        REFERENCES Aircraft(aircraft_id),
+
+    FOREIGN KEY (departure_airport_id)
+        REFERENCES Airport(airport_id),
+
+    FOREIGN KEY (arrival_airport_id)
+        REFERENCES Airport(airport_id),
+
+    CHECK (departure_airport_id <> arrival_airport_id)
+);
+
+CREATE TABLE Booking (
+    booking_id INT PRIMARY KEY AUTO_INCREMENT,
+    flight_id INT,
+    passenger_id INT,
+    booking_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    seat_number VARCHAR(10),
+
+    FOREIGN KEY (flight_id)
+        REFERENCES Flight(flight_id),
+
+    FOREIGN KEY (passenger_id)
+        REFERENCES Passenger(passenger_id),
+
+    UNIQUE (flight_id, passenger_id)
+);
+INSERT INTO Airline VALUES
+(1, 'IndiGo', 'India'),
+(2, 'Air India', 'India'),
+(3, 'Vistara', 'India');
+
+INSERT INTO Aircraft VALUES
+(1, 'Airbus A320', 180),
+(2, 'Boeing 737', 189),
+(3, 'Airbus A321', 220);
+
+INSERT INTO Airport VALUES
+(1, 'Indira Gandhi Intl', 'Delhi'),
+(2, 'Chhatrapati Shivaji Intl', 'Mumbai'),
+(3, 'Kempegowda Intl', 'Bangalore'),
+(4, 'Rajiv Gandhi Intl', 'Hyderabad'),
+(5, 'Chennai Intl', 'Chennai');
+
+INSERT INTO Passenger VALUES
+(1, 'Sambhav Yadav', '9876543210'),
+(2, 'Rahul Sharma', '9876543211'),
+(3, 'Aman Verma', '9876543212'),
+(4, 'Priya Singh', '9876543213'),
+(5, 'Ananya Gupta', '9876543214');
+
+INSERT INTO Flight VALUES
+(1, '2026-09-20 10:00:00', '2026-09-20 12:00:00', 1, 1, 1, 2),
+(2, '2026-09-21 08:30:00', '2026-09-21 11:00:00', 2, 2, 2, 3),
+(3, '2026-09-22 14:00:00', '2026-09-22 16:00:00', 3, 3, 3, 4),
+(4, '2026-09-23 17:30:00', '2026-09-23 19:45:00', 1, 1, 4, 5),
+(5, '2026-09-24 09:00:00', '2026-09-24 11:15:00', 2, 2, 5, 1);
+
+INSERT INTO Booking
+(flight_id, passenger_id, seat_number)
+VALUES
+(1, 1, '14A'),
+(1, 2, '14B'),
+(2, 3, '12A'),
+(3, 4, '08C'),
+(4, 5, '20A');
+
+COMMIT;
+
+SHOW TABLES;
+
+SELECT * FROM Airline;
+
+SELECT * FROM Aircraft;
+
+SELECT * FROM Airport;
+
+SELECT * FROM Passenger;
+
+SELECT * FROM Flight;
+
+SELECT * FROM Booking;
+-- Display airlines from India
+SELECT *
+FROM Airline
+WHERE country = 'India';
+
+-- Find passenger by name
+SELECT *
+FROM Passenger
+WHERE name = 'Rahul Sharma';
+
+-- Find passengers whose IDs are between 1 and 3
+SELECT *
+FROM Passenger
+WHERE passenger_id BETWEEN 1 AND 3;
+
+-- Find aircraft with capacity 180
+SELECT *
+FROM Aircraft
+WHERE capacity = 180;
+
+-- Arrange aircraft by capacity in ascending order
+SELECT *
+FROM Aircraft
+ORDER BY capacity ASC;
+
+-- Arrange passengers alphabetically
+SELECT *
+FROM Passenger
+ORDER BY name ASC;
+
+-- Arrange flights by airline ID in descending order
+SELECT *
+FROM Flight
+ORDER BY airline_id DESC;
+-- Count total passengers
+SELECT COUNT(*) AS total_passengers
+FROM Passenger;
+
+-- Find maximum aircraft capacity
+SELECT MAX(capacity)
+FROM Aircraft;
+
+-- Find minimum aircraft capacity
+SELECT MIN(capacity)
+FROM Aircraft;
+
+-- Find average aircraft capacity
+SELECT AVG(capacity)
+FROM Aircraft;
+
+-- Find total aircraft capacity
+SELECT SUM(capacity)
+FROM Aircraft;
+
+-- Display airline names with their flight IDs
+SELECT
+    Airline.name,
+    Flight.flight_id
+FROM Airline
+INNER JOIN Flight
+ON Airline.airline_id = Flight.airline_id;
+
+-- Display passenger names with booking details
+SELECT
+    Passenger.name,
+    Booking.booking_id,
+    Booking.seat_number
+FROM Passenger
+JOIN Booking
+ON Passenger.passenger_id = Booking.passenger_id;
+
+-- Display departure and arrival cities for each flight
+SELECT
+    Flight.flight_id,
+    A.city AS departure_city,
+    B.city AS arrival_city
+FROM Flight
+JOIN Airport A
+ON Flight.departure_airport_id = A.airport_id
+JOIN Airport B
+ON Flight.arrival_airport_id = B.airport_id;
+
+-- Display airline names with their flight IDs
+SELECT
+    Airline.name,
+    Flight.flight_id
+FROM Airline
+INNER JOIN Flight
+ON Airline.airline_id = Flight.airline_id;
+
+-- Display passenger names with booking details
+SELECT
+    Passenger.name,
+    Booking.booking_id,
+    Booking.seat_number
+FROM Passenger
+JOIN Booking
+ON Passenger.passenger_id = Booking.passenger_id;
+
+-- Display departure and arrival cities for each flight
+SELECT
+    Flight.flight_id,
+    A.city AS departure_city,
+    B.city AS arrival_city
+FROM Flight
+JOIN Airport A
+ON Flight.departure_airport_id = A.airport_id
+JOIN Airport B
+ON Flight.arrival_airport_id = B.airport_id;
+
+SELECT
+    Passenger.name,
+    Booking.booking_id
+FROM Passenger
+LEFT JOIN Booking
+ON Passenger.passenger_id = Booking.passenger_id;
+
+SELECT
+    Passenger.name,
+    Booking.booking_id
+FROM Passenger
+RIGHT JOIN Booking
+ON Passenger.passenger_id = Booking.passenger_id;
+
+-- Count total flights for each airline
+SELECT
+    airline_id,
+    COUNT(*) AS total_flights
+FROM Flight
+GROUP BY airline_id;
+
+-- Count passengers on each flight
+SELECT
+    flight_id,
+    COUNT(*) AS total_passengers
+FROM Booking
+GROUP BY flight_id;
+
+-- Count aircraft according to capacity
+SELECT
+    capacity,
+    COUNT(*) AS total_aircraft
+FROM Aircraft
+GROUP BY capacity;
+
+-- Calculate sum of flight IDs for each airline
+SELECT
+    airline_id,
+    SUM(flight_id) AS total_flight_ids
+FROM Flight
+GROUP BY airline_id;
+
+-- Calculate average flight ID for each airline
+SELECT
+    airline_id,
+    AVG(flight_id) AS average_flight_id
+FROM Flight
+GROUP BY airline_id;
+
+-- Find maximum and minimum flight IDs for each airline
+SELECT
+    airline_id,
+    MAX(flight_id) AS maximum_id,
+    MIN(flight_id) AS minimum_id
+FROM Flight
+GROUP BY airline_id;
+
+-- Arrange airlines by number of flights
+SELECT
+    airline_id,
+    COUNT(*) AS total_flights
+FROM Flight
+GROUP BY airline_id
+ORDER BY total_flights DESC;
+
+-- Display airline names and their total flights
+SELECT
+    Airline.name,
+    COUNT(Flight.flight_id) AS total_flights
+FROM Airline
+JOIN Flight
+ON Airline.airline_id = Flight.airline_id
+GROUP BY Airline.airline_id, Airline.name;
+
+-- Count bookings made by each passenger
+SELECT
+    passenger_id,
+    COUNT(*) AS total_bookings
+FROM Booking
+GROUP BY passenger_id;
+
+-- Display airlines having more than one flight
+SELECT
+    airline_id,
+    COUNT(*) AS total_flights
+FROM Flight
+GROUP BY airline_id
+HAVING COUNT(*) > 1;
+
+-- Display flights having more than one passenger
+SELECT
+    flight_id,
+    COUNT(*) AS total_passengers
+FROM Booking
+GROUP BY flight_id
+HAVING COUNT(*) > 1;
+
+-- Display passengers having more than one booking
+SELECT
+    passenger_id,
+    COUNT(*) AS total_bookings
+FROM Booking
+GROUP BY passenger_id
+HAVING COUNT(*) > 1;
+
+SELECT * FROM Airline;
+SELECT * FROM Aircraft;
+SELECT * FROM Airport;
+SELECT * FROM Passenger;
+SELECT * FROM Flight;
+SELECT * FROM Booking;
